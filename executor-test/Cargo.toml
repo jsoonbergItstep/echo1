@@ -1,0 +1,14 @@
+[package]
+name = "zela-test-executor-test"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+zela-std = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+futures-util = { workspace = true }
+solana-sdk = { workspace = true }

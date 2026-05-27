@@ -1,0 +1,9 @@
+/target
+.envrc
+.env*
+.venv/
+__pycache__/
+wallet_*.json
+executor-test/.DS_Store
+.DS_Store
+.cache/

@@ -1,0 +1,10 @@
+[workspace]
+resolver = "3"
+members = ["executor-test", "echo", "miami_procedure"]
+
+[workspace.dependencies]
+zela-std = { git = "https://github.com/Zela-io/zela-std.git", rev = "e5465e0e60ae6b690664408dbdd885fcdb867eab" }
+log = { version = "0.4" }
+serde = { version = "1", features = ["derive"] }
+futures-util = "0.3.31"
+solana-sdk = "2.2"

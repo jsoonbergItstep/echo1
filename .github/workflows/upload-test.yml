@@ -1,0 +1,41 @@
+name: WASM upload to Test env
+on:
+  workflow_dispatch: {}
+
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  wasm:
+    runs-on: [zela-runner-set]
+    steps:
+      # we install wasi-sdk and add the rustup target
+      # this is needed to build FFI code (e.g. openssl) to wasm using clang
+      - name: Install WASI SDK
+        run: |
+          curl -L --progress-bar -o /tmp/wasi-sdk.deb https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-27/wasi-sdk-27.0-x86_64-linux.deb
+          sudo dpkg -i /tmp/wasi-sdk.deb
+          rustup target add wasm32-wasip2
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # skipping actions/cache to keep the example clean
+      - name: Build WASM
+        env:
+          # needs to be set for the build process to pick up the downloaded wasi-sdk - this is the value when installing the deb package
+          WASI_SYSROOT: /opt/wasi-sdk/share/wasi-sysroot
+        run: |
+          cargo build --release --target wasm32-wasip2 --package zela-test-executor-test
+      - name: Upload WASM
+        env:
+          ZELA_TOKEN_URL: https://tel-core-node-test-01.rrpc.systems:9443/realms/zela-test/protocol/openid-connect/token
+          ZELA_API_URL: https://tel-core-node-test-01.rrpc.systems:8443
+          ZELA_PROJECT: '67e55044-10b1-426f-9247-bb680e5fe0c8'
+          ZELA_PROCEDURE_NAME: 'zela-test-executor-test'
+        run: |
+          set -e
+          # OAuth2 client_credentials flow
+          token=$(curl -k -sS --user '${{ secrets.ZELA_UPLOAD_CLIENT_ID }}:${{ secrets.ZELA_UPLOAD_CLIENT_SECRET }}' \
+            --data-urlencode 'grant_type=client_credentials' --data-urlencode 'scope=zela-builder:read zela-builder:write' \
+            "$ZELA_TOKEN_URL" | jq -r .access_token)
+          # POST WASM
+          curl -k --progress-bar -f -H "authorization: Bearer $token" -H 'content-type: application/wasm' \
+            --data-binary '@target/wasm32-wasip2/release/zela_test_executor_test.wasm' \
+            "$ZELA_API_URL/procedures/$ZELA_PROCEDURE_NAME/wasm?project=$ZELA_PROJECT&file_name=zela_test_executor_test.wasm"
