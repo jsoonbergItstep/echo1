@@ -2518,7 +2518,6 @@ dependencies = [
 name = "procedure_runtime"
 version = "0.1.0"
 dependencies = [
- "serde_json",
  "zela-std",
 ]
 

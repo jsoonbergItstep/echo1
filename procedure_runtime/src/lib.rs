@@ -7,11 +7,8 @@ impl CustomProcedure for ProcedureRuntimeProcedure {
     type SuccessData = JsonValue;
     type ErrorData = ();
 
-    async fn run(_params: Self::Params) -> Result<Self::SuccessData, RpcError<Self::ErrorData>> {
-        Ok(serde_json::json!({
-            "ok": true,
-            "procedure_duration_us": 0
-        }))
+    async fn run(params: Self::Params) -> Result<Self::SuccessData, RpcError<Self::ErrorData>> {
+        Ok(params)
     }
 }
 
