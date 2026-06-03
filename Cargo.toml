@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["executor-test", "echo", "miami_procedure"]
+members = ["executor-test", "echo", "miami_procedure", "procedure_runtime"]
 
 [workspace.dependencies]
 zela-std = { git = "https://github.com/Zela-io/zela-std.git", rev = "e5465e0e60ae6b690664408dbdd885fcdb867eab" }
